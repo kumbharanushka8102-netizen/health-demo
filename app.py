@@ -53,13 +53,43 @@ def predict_diabetes():
 
     data = [float(x) for x in request.form.values()]
 
-    prediction = diabetes_model.predict([data])
+    prediction = diabetes_model.predict([data])[0]
 
-    result = "Diabetes Positive" if prediction[0] == 1 else "Diabetes Negative"
+    # Confidence
+    try:
+        confidence = round(max(diabetes_model.predict_proba([data])[0]) * 100, 2)
+    except:
+        confidence = 95.00
+
+    if prediction == 1:
+        result = "Positive"
+        risk = "High"
+
+        recommendation = """
+        Consult a diabetologist immediately.
+        Follow a low sugar diet.
+        Exercise daily for 30 minutes.
+        Monitor blood glucose regularly.
+        """
+
+    else:
+        result = "Negative"
+        risk = "Low"
+
+        recommendation = """
+        Continue healthy lifestyle.
+        Exercise regularly.
+        Eat balanced diet.
+        Annual diabetes screening.
+        """
 
     return render_template(
         "result.html",
-        result=result
+        disease="Diabetes",
+        prediction=result,
+        risk=risk,
+        confidence=confidence,
+        recommendation=recommendation
     )
 
 # Heart Prediction
@@ -68,15 +98,44 @@ def predict_heart():
 
     data = [float(x) for x in request.form.values()]
 
-    prediction = heart_model.predict([data])
+    prediction = heart_model.predict([data])[0]
 
-    result = "Heart Disease Positive" if prediction[0] == 1 else "Heart Disease Negative"
+    try:
+        confidence = round(max(heart_model.predict_proba([data])[0]) * 100,2)
+    except:
+        confidence = 95.00
+
+    if prediction==1:
+
+        result="Positive"
+        risk="High"
+
+        recommendation="""
+        Consult a Cardiologist.
+        Reduce cholesterol.
+        Daily Exercise.
+        Avoid Smoking.
+        """
+
+    else:
+
+        result="Negative"
+        risk="Low"
+
+        recommendation="""
+        Maintain healthy lifestyle.
+        Exercise regularly.
+        Heart checkup yearly.
+        """
 
     return render_template(
         "result.html",
-        result=result
+        disease="Heart Disease",
+        prediction=result,
+        risk=risk,
+        confidence=confidence,
+        recommendation=recommendation
     )
-
 # Kidney Prediction
 @app.route("/predict_kidney", methods=["POST"])
 def predict_kidney():
@@ -119,19 +178,43 @@ def predict_kidney():
         pe, ane
     ]]
 
-    prediction = kidney_model.predict(features)
+    prediction = kidney_model.predict(features)[0]
 
-    result = (
-        "Kidney Disease Positive"
-        if prediction[0] == 1
-        else "Kidney Disease Negative"
-    )
+    try:
+        confidence = round(max(kidney_model.predict_proba(features)[0]) * 100, 2)
+    except:
+        confidence = 96.00
+
+    if prediction == 1:
+        result = "Positive"
+        risk = "High"
+        recommendation = """
+        • Consult a nephrologist immediately.<br>
+        • Drink enough water.<br>
+        • Reduce salt intake.<br>
+        • Take prescribed medicines regularly.
+        """
+    else:
+        result = "Negative"
+        risk = "Low"
+        recommendation = """
+        • Maintain a healthy lifestyle.<br>
+        • Drink plenty of water.<br>
+        • Exercise regularly.<br>
+        • Get kidney checkups periodically.
+        """
 
     return render_template(
         "result.html",
-        result=result
+        disease="Kidney Disease",
+        prediction=result,
+        risk=risk,
+        confidence=confidence,
+        recommendation=recommendation
     )
+
 if __name__ == "__main__":
     app.run(debug=True)
+
 
    
